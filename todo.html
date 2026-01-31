@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Task Manager</title>
+
+<style>
+body {
+  background: #eef2f3;
+  font-family: Verdana, sans-serif;
+}
+
+.container {
+  max-width: 500px;
+  background: #fff;
+  margin: 50px auto;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+h2 {
+  text-align: center;
+  color: #2c3e50;
+}
+
+.input-box {
+  display: flex;
+  gap: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+}
+
+button {
+  padding: 10px 15px;
+  background: #3498db;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #2980b9;
+}
+
+.task {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 10px;
+  margin-top: 10px;
+  border-left: 5px solid #f39c12;
+}
+
+.task.done {
+  border-left: 5px solid #27ae60;
+  text-decoration: line-through;
+  color: #777;
+}
+
+.actions button {
+  margin-left: 5px;
+  background: #27ae60;
+}
+
+.actions .delete {
+  background: #e74c3c;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Daily Task Manager</h2>
+
+  <div class="input-box">
+    <input type="text" id="taskInput" placeholder="Enter your task">
+    <button onclick="addTask()">Add</button>
+  </div>
+
+  <div id="taskList"></div>
+</div>
+
+<script>
+window.onload = loadTasks;
+
+function addTask() {
+  let text = taskInput.value.trim();
+  if (text === "") {
+    alert("Task cannot be empty");
+    return;
+  }
+
+  let tasks = getTasks();
+  tasks.push({ name: text, status: "pending" });
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+
+  taskInput.value = "";
+  loadTasks();
+}
+
+function loadTasks() {
+  let list = document.getElementById("taskList");
+  list.innerHTML = "";
+  let tasks = getTasks();
+
+  tasks.forEach((task, index) => {
+    let div = document.createElement("div");
+    div.className = "task" + (task.status === "done" ? " done" : "");
+
+    div.innerHTML = `
+      <span>${task.name}</span>
+      <div class="actions">
+        <button onclick="markDone(${index})">Done</button>
+        <button class="delete" onclick="removeTask(${index})">Delete</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function markDone(index) {
+  let tasks = getTasks();
+  tasks[index].status = "done";
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  loadTasks();
+}
+
+function removeTask(index) {
+  let tasks = getTasks();
+  tasks.splice(index, 1);
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  loadTasks();
+}
+
+function getTasks() {
+  return JSON.parse(localStorage.getItem("tasks")) || [];
+}
+</script>
+
+</body>
+</html>
